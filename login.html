@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Estudos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <div class="hamburguer">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="col-md-7 text-center">
+                    <div id="logo"></div>
+                </div>
+                <div class="col-md-3">
+                    <input id="searchBar" type="text" placeholder="Buscar exercícios...">
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="">Natureza <span class="badge">12</span></a></li>
+                    <li><a href="">Humanas <span class="badge">8</span></a></li>
+                    <li><a href="">Exatas <span class="badge">15</span></a></li>
+                    <li><a href="">Linguagem <span class="badge">10</span></a></li>
+                    <li><a href="">Vestibular <span class="badge">25</span></a></li>
+                    <li><a href="">Enem <span class="badge">30</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <main class="container">
+        <form>
+            <label>E-mail</label>
+            <input type="text">
+        </form>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div id="logo-footer"></div>
+                    <p class="mt-2">Plataforma de estudos online</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links Úteis</h5>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Quem Somos</a>
+                </div>
+                <div class="col-md-3">
+                    <h5>Recursos</h5>
+                    <a href="#">Exercícios</a>
+                    <a href="#">Simulados</a>
+                    <a href="#">Videoaulas</a>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contato</h5>
+                    <a href="#">Suporte</a>
+                    <a href="#">Dúvidas Frequentes</a>
+                    <a href="#">Trabalhe Conosco</a>
+                </div>
+            </div>
+            <footer>
+                Feito pelo esquadrão gafas © 2024
+            </footer>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script>
+        // Adicionando funcionalidade básica
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulação de busca
+            const searchBar = document.getElementById('searchBar');
+            searchBar.addEventListener('keyup', function(event) {
+                if (event.key === 'Enter') {
+                    alert('Buscando por: ' + this.value);
+                    // Aqui você implementaria a lógica de busca real
+                }
+            });
+            
+            // Menu hamburguer para mobile
+            const hamburguer = document.querySelector('.hamburguer');
+            hamburguer.addEventListener('click', function() {
+                alert('Menu aberto!');
+                // Aqui você implementaria a abertura do menu lateral
+            });
+            
+            // Botões de ação
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const cardTitle = this.closest('.card-body').querySelector('h4').textContent;
+                    alert('Abrindo exercícios de: ' + cardTitle);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

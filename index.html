@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma de Estudos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-2">
+                    <div class="hamburguer">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+                <div class="col-md-7 text-center">
+                    <div id="logo">StudyHub</div>
+                </div>
+                <div class="col-md-3">
+                    <input id="searchBar" type="text" placeholder="Buscar exercícios...">
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" data-category="natureza">Natureza <span class="badge">12</span></a></li>
+                    <li><a href="#" data-category="humanas">Humanas <span class="badge">8</span></a></li>
+                    <li><a href="#" data-category="exatas">Exatas <span class="badge">15</span></a></li>
+                    <li><a href="#" data-category="linguagem">Linguagem <span class="badge">10</span></a></li>
+                    <li><a href="#" data-category="vestibular">Vestibular <span class="badge">25</span></a></li>
+                    <li><a href="#" data-category="enem">Enem <span class="badge">30</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    
+    <!-- Menu Lateral -->
+    <div class="sidebar-overlay"></div>
+    <div class="sidebar">
+        <button class="sidebar-close">&times;</button>
+        <h4>Menu</h4>
+        <ul>
+            <li><a href="#" data-section="inicio">Início</a></li>
+            <li><a href="#" data-section="exercicios">Exercícios</a></li>
+            <li><a href="#" data-section="flashcards">Flashcards</a></li>
+            <li><a href="#" data-section="quiz">Quiz</a></li>
+            <li><a href="#" data-section="simulados">Simulados</a></li>
+            <li><a href="#" data-section="progresso">Meu Progresso</a></li>
+            <li><a href="#" data-section="configuracoes">Configurações</a></li>
+        </ul>
+    </div>
+    
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        <!-- Página Inicial -->
+        <section id="inicio" class="page active">
+            <div class="study-timer">
+                <div class="timer-display">
+                    <h3><i class="fas fa-clock"></i> Timer de Estudo</h3>
+                    <div class="time" id="studyTime">00:00:00</div>
+                    <div class="timer-controls">
+                        <button class="btn btn-success" id="startTimer">
+                            <i class="fas fa-play"></i> Iniciar
+                        </button>
+                        <button class="btn btn-warning" id="pauseTimer">
+                            <i class="fas fa-pause"></i> Pausar
+                        </button>
+                        <button class="btn btn-danger" id="resetTimer">
+                            <i class="fas fa-stop"></i> Resetar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <section class="exercicios">
+                <h2 class="mb-4">Exercícios Recomendados</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card-exercicio">
+                            <div class="img-exercicio">
+                                <i class="fas fa-atom fa-3x"></i>
+                            </div>
+                            <div class="card-body">
+                                <h4>Química Orgânica</h4>
+                                <p>Exercícios sobre funções orgânicas e reações químicas para o ensino médio.</p>
+                                <button class="btn btn-primary mt-2" data-category="natureza">Ver Exercícios</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-exercicio">
+                            <div class="img-exercicio">
+                                <i class="fas fa-calculator fa-3x"></i>
+                            </div>
+                            <div class="card-body">
+                                <h4>Matemática Básica</h4>
+                                <p>Problemas de álgebra, geometria e aritmética para reforço escolar.</p>
+                                <button class="btn btn-primary mt-2" data-category="exatas">Ver Exercícios</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card-exercicio">
+                            <div class="img-exercicio">
+                                <i class="fas fa-globe-americas fa-3x"></i>
+                            </div>
+                            <div class="card-body">
+                                <h4>Geografia do Brasil</h4>
+                                <p>Questões sobre relevo, clima e aspectos econômicos do território brasileiro.</p>
+                                <button class="btn btn-primary mt-2" data-category="humanas">Ver Exercícios</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="exercicio-destaque">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="img-exercicio">
+                            <i class="fas fa-brain fa-5x"></i>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h2>Simulado ENEM 2024</h2>
+                        <p>Teste seus conhecimentos com nosso simulado completo do ENEM. Inclui todas as áreas do conhecimento com questões inéditas e comentadas por especialistas. Prepare-se para o exame mais importante do país!</p>
+                        <button class="btn btn-light mt-3" data-section="simulados">Iniciar Simulado</button>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="materias populares">
+                <h3>Matérias Mais Acessadas</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card-exercicio">
+                            <div class="row g-0">
+                                <div class="col-md-6">
+                                    <div class="img-exercicio">
+                                        <i class="fas fa-book fa-2x"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card-body">
+                                        <h4>Literatura Brasileira</h4>
+                                        <p>Exercícios sobre principais autores e obras do Modernismo.</p>
+                                        <button class="btn btn-sm btn-primary mt-2" data-category="linguagem">Ver Exercícios</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card-exercicio">
+                            <div class="row g-0">
+                                <div class="col-md-6">
+                                    <div class="img-exercicio">
+                                        <i class="fas fa-flask fa-2x"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card-body">
+                                        <h4>Física Moderna</h4>
+                                        <p>Questões sobre relatividade e mecânica quântica para vestibulares.</p>
+                                        <button class="btn btn-sm btn-primary mt-2" data-category="exatas">Ver Exercícios</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Página de Exercícios -->
+        <section id="exercicios" class="page">
+            <div class="page-header">
+                <h2>Exercícios por Categoria</h2>
+                <p>Selecione uma categoria para ver os exercícios disponíveis</p>
+            </div>
+            
+            <div class="category-selector">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="category-card" data-category="natureza">
+                            <div class="category-icon">
+                                <i class="fas fa-leaf fa-2x"></i>
+                            </div>
+                            <h4>Natureza</h4>
+                            <p>Biologia, Química e Física</p>
+                            <span class="badge">12 exercícios</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="category-card" data-category="humanas">
+                            <div class="category-icon">
+                                <i class="fas fa-globe-americas fa-2x"></i>
+                            </div>
+                            <h4>Humanas</h4>
+                            <p>História, Geografia e Filosofia</p>
+                            <span class="badge">8 exercícios</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="category-card" data-category="exatas">
+                            <div class="category-icon">
+                                <i class="fas fa-calculator fa-2x"></i>
+                            </div>
+                            <h4>Exatas</h4>
+                            <p>Matemática, Física e Química</p>
+                            <span class="badge">15 exercícios</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="category-card" data-category="linguagem">
+                            <div class="category-icon">
+                                <i class="fas fa-book fa-2x"></i>
+                            </div>
+                            <h4>Linguagem</h4>
+                            <p>Português, Literatura e Línguas</p>
+                            <span class="badge">10 exercícios</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="category-card" data-category="vestibular">
+                            <div class="category-icon">
+                                <i class="fas fa-graduation-cap fa-2x"></i>
+                            </div>
+                            <h4>Vestibular</h4>
+                            <p>Exercícios específicos para vestibulares</p>
+                            <span class="badge">25 exercícios</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="category-card" data-category="enem">
+                            <div class="category-icon">
+                                <i class="fas fa-brain fa-2x"></i>
+                            </div>
+                            <h4>ENEM</h4>
+                            <p>Questões do ENEM e simulados</p>
+                            <span class="badge">30 exercícios</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Flashcards -->
+        <section id="flashcards" class="page">
+            <div class="page-header">
+                <h2>Flashcards</h2>
+                <p>Estude com flashcards interativos</p>
+            </div>
+            
+            <div class="flashcard-container">
+                <div class="flashcard" id="flashcard">
+                    <div class="flashcard-inner">
+                        <div class="flashcard-front">
+                            <h3 id="flashcard-question">Pergunta aparecerá aqui</h3>
+                            <p>Clique para ver a resposta</p>
+                        </div>
+                        <div class="flashcard-back">
+                            <h3 id="flashcard-answer">Resposta aparecerá aqui</h3>
+                            <p>Clique para voltar</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flashcard-controls">
+                    <button class="btn btn-secondary" id="prev-card">
+                        <i class="fas fa-arrow-left"></i> Anterior
+                    </button>
+                    <button class="btn btn-primary" id="next-card">
+                        Próximo <i class="fas fa-arrow-right"></i>
+                    </button>
+                    <button class="btn btn-success" id="shuffle-cards">
+                        <i class="fas fa-random"></i> Embaralhar
+                    </button>
+                </div>
+                
+                <div class="flashcard-progress">
+                    <span id="current-card">1</span> de <span id="total-cards">10</span>
+                </div>
+            </div>
+            
+            <div class="flashcard-sets mt-5">
+                <h4>Conjuntos de Flashcards</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="flashcard-set" data-set="biologia">
+                            <div class="set-icon">
+                                <i class="fas fa-dna fa-2x"></i>
+                            </div>
+                            <h5>Biologia Celular</h5>
+                            <p>15 flashcards</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="flashcard-set" data-set="historia">
+                            <div class="set-icon">
+                                <i class="fas fa-landmark fa-2x"></i>
+                            </div>
+                            <h5>História do Brasil</h5>
+                            <p>20 flashcards</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="flashcard-set" data-set="quimica">
+                            <div class="set-icon">
+                                <i class="fas fa-flask fa-2x"></i>
+                            </div>
+                            <h5>Tabela Periódica</h5>
+                            <p>30 flashcards</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Quiz -->
+        <section id="quiz" class="page">
+            <div class="page-header">
+                <h2>Quiz</h2>
+                <p>Teste seus conhecimentos com quizzes rápidos</p>
+            </div>
+            
+            <div class="quiz-container" id="quiz-container">
+                <div class="quiz-categories">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="quiz-category" data-quiz="matematica">
+                                <div class="quiz-icon">
+                                    <i class="fas fa-calculator fa-3x"></i>
+                                </div>
+                                <h4>Matemática</h4>
+                                <p>10 questões</p>
+                                <span class="badge">Fácil</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="quiz-category" data-quiz="portugues">
+                                <div class="quiz-icon">
+                                    <i class="fas fa-book fa-3x"></i>
+                                </div>
+                                <h4>Português</h4>
+                                <p>15 questões</p>
+                                <span class="badge">Médio</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="quiz-category" data-quiz="ciencias">
+                                <div class="quiz-icon">
+                                    <i class="fas fa-flask fa-3x"></i>
+                                </div>
+                                <h4>Ciências</h4>
+                                <p>12 questões</p>
+                                <span class="badge">Difícil</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="quiz-interface" id="quiz-interface" style="display: none;">
+                    <div class="quiz-header">
+                        <div class="quiz-progress">
+                            Questão <span id="current-question">1</span> de <span id="total-questions">10</span>
+                        </div>
+                        <div class="quiz-timer">
+                            <i class="fas fa-clock"></i> <span id="quiz-time">00:00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-question">
+                        <h3 id="question-text">Pergunta aparecerá aqui</h3>
+                    </div>
+                    
+                    <div class="quiz-options" id="quiz-options">
+                        <!-- Opções serão inseridas aqui -->
+                    </div>
+                    
+                    <div class="quiz-controls">
+                        <button class="btn btn-secondary" id="prev-question">
+                            <i class="fas fa-arrow-left"></i> Anterior
+                        </button>
+                        <button class="btn btn-primary" id="next-question">
+                            Próxima <i class="fas fa-arrow-right"></i>
+                        </button>
+                        <button class="btn btn-success" id="submit-quiz">
+                            Finalizar Quiz
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="quiz-results" id="quiz-results" style="display: none;">
+                    <h3>Resultado do Quiz</h3>
+                    <div class="score-display">
+                        <div class="score-circle">
+                            <span id="score-percentage">0%</span>
+                        </div>
+                        <p>Você acertou <span id="correct-answers">0</span> de <span id="total-answers">0</span> questões</p>
+                    </div>
+                    <button class="btn btn-primary" id="restart-quiz">
+                        <i class="fas fa-redo"></i> Fazer Outro Quiz
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Lista de Exercícios -->
+        <section id="lista-exercicios" class="page">
+            <div class="page-header">
+                <button class="btn btn-secondary mb-3 back-button">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </button>
+                <h2 id="categoria-titulo">Exercícios</h2>
+                <p id="categoria-descricao">Lista de exercícios disponíveis</p>
+            </div>
+            
+            <div class="exercises-list">
+                <div class="row" id="exercicios-container">
+                    <!-- Os exercícios serão carregados dinamicamente aqui -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Simulados -->
+        <section id="simulados" class="page">
+            <div class="page-header">
+                <h2>Simulados Disponíveis</h2>
+                <p>Teste seus conhecimentos com nossos simulados</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card-simulado">
+                        <div class="simulado-header">
+                            <h4>Simulado ENEM 2024</h4>
+                            <span class="badge">Completo</span>
+                        </div>
+                        <div class="simulado-body">
+                            <p>Simulado completo com 180 questões, seguindo o formato oficial do ENEM.</p>
+                            <div class="simulado-info">
+                                <span><i class="fas fa-clock"></i> 5h30min</span>
+                                <span><i class="fas fa-question-circle"></i> 180 questões</span>
+                            </div>
+                            <button class="btn btn-primary mt-3">Iniciar Simulado</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-simulado">
+                        <div class="simulado-header">
+                            <h4>Simulado Vestibular</h4>
+                            <span class="badge">FUVEST</span>
+                        </div>
+                        <div class="simulado-body">
+                            <p>Simulado baseado no vestibular da FUVEST com 90 questões.</p>
+                            <div class="simulado-info">
+                                <span><i class="fas fa-clock"></i> 4h</span>
+                                <span><i class="fas fa-question-circle"></i> 90 questões</span>
+                            </div>
+                            <button class="btn btn-primary mt-3">Iniciar Simulado</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Progresso -->
+        <section id="progresso" class="page">
+            <div class="page-header">
+                <h2>Meu Progresso</h2>
+                <p>Acompanhe seu desempenho nos estudos</p>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card-progresso">
+                        <h4>Estatísticas Gerais</h4>
+                        <div class="progresso-stats">
+                            <div class="stat-item">
+                                <span class="stat-value" id="total-exercises">24</span>
+                                <span class="stat-label">Exercícios Concluídos</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="accuracy-rate">78%</span>
+                                <span class="stat-label">Taxa de Acerto</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="study-hours">15h</span>
+                                <span class="stat-label">Tempo de Estudo</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card-progresso">
+                        <h4>Desempenho por Matéria</h4>
+                        <div class="materia-progresso">
+                            <div class="materia-item">
+                                <span>Matemática</span>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 85%">85%</div>
+                                </div>
+                            </div>
+                            <div class="materia-item">
+                                <span>Português</span>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 72%">72%</div>
+                                </div>
+                            </div>
+                            <div class="materia-item">
+                                <span>História</span>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 68%">68%</div>
+                                </div>
+                            </div>
+                            <div class="materia-item">
+                                <span>Química</span>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 79%">79%</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="study-history mt-5">
+                <h4>Histórico de Estudos</h4>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-date">Hoje</div>
+                        <div class="timeline-content">
+                            <h5>Quiz de Matemática</h5>
+                            <p>Acertou 8 de 10 questões</p>
+                            <span class="badge bg-success">80%</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">Ontem</div>
+                        <div class="timeline-content">
+                            <h5>Flashcards de Biologia</h5>
+                            <p>Revisou 15 flashcards</p>
+                            <span class="badge bg-primary">15 cards</span>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-date">2 dias atrás</div>
+                        <div class="timeline-content">
+                            <h5>Exercícios de Português</h5>
+                            <p>Completou 5 exercícios</p>
+                            <span class="badge bg-info">100%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Configurações -->
+        <section id="configuracoes" class="page">
+            <div class="page-header">
+                <h2>Configurações</h2>
+                <p>Personalize sua experiência de estudo</p>
+            </div>
+            
+            <div class="card-configuracoes">
+                <h4>Preferências de Estudo</h4>
+                <div class="config-item">
+                    <label>
+                        <input type="checkbox" id="modo-escuro"> Modo escuro
+                    </label>
+                </div>
+                <div class="config-item">
+                    <label>
+                        <input type="checkbox" id="som-ativado"> Som ao completar exercícios
+                    </label>
+                </div>
+                
+                <h4 class="mt-4">Metas de Estudo</h4>
+                <div class="config-item">
+                    <label>Horas de estudo por semana:</label>
+                    <select class="form-select" id="horas-estudo">
+                        <option>5 horas</option>
+                        <option selected>10 horas</option>
+                        <option>15 horas</option>
+                        <option>20 horas</option>
+                    </select>
+                </div>
+                
+                <h4 class="mt-4">Timer de Estudo</h4>
+                <div class="config-item">
+                    <label>Tempo de foco (Pomodoro):</label>
+                    <select class="form-select" id="pomodoro-time">
+                        <option>25 minutos</option>
+                        <option selected>30 minutos</option>
+                        <option>45 minutos</option>
+                        <option>60 minutos</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary mt-4" id="salvar-configuracoes">Salvar Configurações</button>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div id="logo-footer">StudyHub</div>
+                    <p class="mt-2">Plataforma de estudos online</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>Links Úteis</h5>
+                    <a href="#">Política de Privacidade</a>
+                    <a href="#">Termos de Uso</a>
+                    <a href="#">Quem Somos</a>
+                </div>
+                <div class="col-md-3">
+                    <h5>Recursos</h5>
+                    <a href="#" data-section="exercicios">Exercícios</a>
+                    <a href="#" data-section="flashcards">Flashcards</a>
+                    <a href="#" data-section="quiz">Quiz</a>
+                </div>
+                <div class="col-md-3">
+                    <h5>Contato</h5>
+                    <a href="#">Suporte</a>
+                    <a href="#">Dúvidas Frequentes</a>
+                    <a href="#">Trabalhe Conosco</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                Feito pelo esquadrão gafas © 2024
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+</html>
