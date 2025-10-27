@@ -18,24 +18,100 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebarOverlay.classList.remove('active');
     }
     
-    // Sistema de busca
+    // ========== SISTEMA DE BUSCA MELHORADO ==========
     const searchBar = document.getElementById('searchBar');
     
     searchBar.addEventListener('keyup', function() {
-        const searchTerm = this.value.toLowerCase();
-        const cards = document.querySelectorAll('.card-exercicio');
+        const searchTerm = this.value.toLowerCase().trim();
         
-        cards.forEach(card => {
-            const title = card.querySelector('h4').textContent.toLowerCase();
-            const description = card.querySelector('p').textContent.toLowerCase();
+        // Se a busca estiver vazia, mostrar todos os elementos
+        if (searchTerm === '') {
+            showAllContent();
+            return;
+        }
+        
+        // Elementos pesquisáveis
+        const searchableElements = document.querySelectorAll(`
+            .card-exercicio,
+            .category-card,
+            .flashcard-set,
+            .quiz-category,
+            .card-simulado,
+            .exercise-item
+        `);
+        
+        let foundResults = false;
+        
+        searchableElements.forEach(element => {
+            const textContent = getElementText(element).toLowerCase();
             
-            if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                card.style.display = 'block';
+            if (textContent.includes(searchTerm)) {
+                element.style.display = 'block';
+                element.classList.add('search-highlight');
+                foundResults = true;
             } else {
-                card.style.display = 'none';
+                element.style.display = 'none';
+                element.classList.remove('search-highlight');
             }
         });
+        
+        // Mostrar mensagem se não encontrar resultados
+        showNoResultsMessage(!foundResults, searchTerm);
     });
+    
+    // Função para obter todo o texto de um elemento
+    function getElementText(element) {
+        return element.textContent || element.innerText || '';
+    }
+    
+    // Função para mostrar todos os conteúdos
+    function showAllContent() {
+        const allElements = document.querySelectorAll(`
+            .card-exercicio,
+            .category-card,
+            .flashcard-set,
+            .quiz-category,
+            .card-simulado,
+            .exercise-item
+        `);
+        
+        allElements.forEach(element => {
+            element.style.display = 'block';
+            element.classList.remove('search-highlight');
+        });
+        
+        // Remover mensagem de nenhum resultado
+        const existingMessage = document.querySelector('.no-results-message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+    }
+    
+    // Função para mostrar mensagem quando não houver resultados
+    function showNoResultsMessage(show, searchTerm) {
+        const existingMessage = document.querySelector('.no-results-message');
+        
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+        
+        if (show) {
+            const message = document.createElement('div');
+            message.className = 'no-results-message alert alert-info mt-4';
+            message.innerHTML = `
+                <i class="fas fa-search me-2"></i>
+                Nenhum resultado encontrado para "<strong>${searchTerm}</strong>".
+                Tente usar termos diferentes.
+            `;
+            
+            // Inserir a mensagem no conteúdo principal
+            const mainContent = document.querySelector('main .container');
+            const activePage = mainContent.querySelector('.page.active');
+            if (activePage) {
+                activePage.appendChild(message);
+            }
+        }
+    }
     
     // Navegação entre páginas
     const pages = document.querySelectorAll('.page');
@@ -52,10 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
             targetPage.classList.add('active');
         }
         
-        // Parar timer quando sair da página inicial
-        if (pageId !== 'inicio' && timerInterval) {
-            pauseTimer();
-        }
+        // Limpar busca quando mudar de página
+        searchBar.value = '';
+        showAllContent();
     }
     
     // Event listeners para navegação
@@ -306,91 +381,259 @@ document.addEventListener('DOMContentLoaded', function() {
         loadFlashcard();
     }
     
-    // ========== QUIZ ==========
+    // ========== SISTEMA SQLITE PARA QUIZ ==========
+    let db = null;
     let currentQuiz = null;
     let currentQuestionIndex = 0;
     let userAnswers = [];
     let quizTimer = null;
     let quizTime = 0;
-    
-    function initQuiz() {
-        // Dados de exemplo para quizzes
-        const quizData = {
-            matematica: {
-                title: "Quiz de Matemática",
-                questions: [
-                    {
-                        question: "Qual o resultado de 15 + 27?",
-                        options: ["32", "42", "52", "62"],
-                        correct: 1
-                    },
-                    {
-                        question: "Quanto é 8 × 7?",
-                        options: ["48", "56", "64", "72"],
-                        correct: 1
-                    },
-                    {
-                        question: "Qual a raiz quadrada de 144?",
-                        options: ["10", "11", "12", "13"],
-                        correct: 2
-                    }
-                ]
-            },
-            portugues: {
-                title: "Quiz de Português",
-                questions: [
-                    {
-                        question: "Qual o plural de 'cidadão'?",
-                        options: ["Cidadãos", "Cidadões", "Cidadães", "Cidadãos"],
-                        correct: 0
-                    },
-                    {
-                        question: "Qual destas palavras é um substantivo?",
-                        options: ["Correr", "Bonito", "Casa", "Rapidamente"],
-                        correct: 2
-                    }
-                ]
-            },
-            ciencias: {
-                title: "Quiz de Ciências",
-                questions: [
-                    {
-                        question: "Quantos planetas existem no sistema solar?",
-                        options: ["7", "8", "9", "10"],
-                        correct: 1
-                    },
-                    {
-                        question: "Qual o elemento químico mais abundante na Terra?",
-                        options: ["Oxigênio", "Silício", "Ferro", "Alumínio"],
-                        correct: 0
-                    }
-                ]
+
+    // Inicializar o banco de dados
+    async function initDatabase() {
+        try {
+            // Verificar se SQL.js está disponível
+            if (typeof initSqlJs === 'undefined') {
+                console.log('SQL.js não carregado, usando localStorage como fallback');
+                initLocalStorageFallback();
+                return;
             }
-        };
-        
-        // Event listeners para categorias de quiz
-        const quizCategories = document.querySelectorAll('.quiz-category');
-        quizCategories.forEach(category => {
-            category.addEventListener('click', function() {
-                const quizType = this.getAttribute('data-quiz');
-                if (quizData[quizType]) {
-                    startQuiz(quizData[quizType]);
-                }
+
+            // Carregar SQL.js
+            const SQL = await initSqlJs({
+                locateFile: file => `https://cdn.jsdelivr.net/npm/sql.js@1.8.0/dist/${file}`
             });
+            
+            // Criar novo banco de dados
+            db = new SQL.Database();
+            
+            // Criar tabelas
+            createTables();
+            
+            // Inserir questões iniciais
+            insertSampleQuestions();
+            
+            console.log('Banco de dados SQLite inicializado com sucesso!');
+        } catch (error) {
+            console.error('Erro ao inicializar banco de dados:', error);
+            // Fallback para localStorage se SQLite não funcionar
+            initLocalStorageFallback();
+        }
+    }
+
+    // Criar tabelas necessárias
+    function createTables() {
+        // Tabela de categorias
+        db.run(`
+            CREATE TABLE IF NOT EXISTS categories (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+        
+        // Tabela de questões
+        db.run(`
+            CREATE TABLE IF NOT EXISTS questions (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                category_id INTEGER,
+                question_text TEXT NOT NULL,
+                option_a TEXT NOT NULL,
+                option_b TEXT NOT NULL,
+                option_c TEXT NOT NULL,
+                option_d TEXT NOT NULL,
+                correct_answer TEXT NOT NULL,
+                explanation TEXT,
+                difficulty TEXT CHECK(difficulty IN ('facil', 'medio', 'dificil')),
+                subject TEXT,
+                grade_level TEXT,
+                time_estimate TEXT,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (category_id) REFERENCES categories (id)
+            )
+        `);
+    }
+
+    // Inserir questões de exemplo
+    function insertSampleQuestions() {
+        // Verificar se já existem questões para não duplicar
+        const count = db.exec("SELECT COUNT(*) as count FROM questions");
+        if (count[0] && count[0].values[0][0] > 0) return;
+        
+        // Inserir categorias
+        const categories = [
+            ['Matemática', 'Questões de matemática do ensino fundamental e médio'],
+            ['Português', 'Questões de língua portuguesa e literatura'],
+            ['Ciências', 'Questões de biologia, química e física'],
+            ['História', 'Questões de história do Brasil e geral'],
+            ['Geografia', 'Questões de geografia física e humana']
+        ];
+        
+        categories.forEach(category => {
+            db.run("INSERT INTO categories (name, description) VALUES (?, ?)", category);
         });
         
-        // Controles do quiz
-        document.getElementById('prev-question').addEventListener('click', prevQuestion);
-        document.getElementById('next-question').addEventListener('click', nextQuestion);
-        document.getElementById('submit-quiz').addEventListener('click', submitQuiz);
-        document.getElementById('restart-quiz').addEventListener('click', restartQuiz);
+        // Inserir questões de exemplo
+        const sampleQuestions = [
+            // Matemática
+            [1, 'Qual o resultado de 15 + 27?', '32', '42', '52', '62', 'B', '15 + 27 = 42', 'facil', 'Matemática', 'Fundamental', '2 minutos'],
+            [1, 'Qual a área de um quadrado com lado 5 cm?', '20 cm²', '25 cm²', '30 cm²', '35 cm²', 'B', 'Área = lado × lado = 5 × 5 = 25 cm²', 'facil', 'Matemática', 'Fundamental', '3 minutos'],
+            [1, 'Resolva a equação: 2x + 8 = 20', 'x = 4', 'x = 6', 'x = 8', 'x = 10', 'B', '2x + 8 = 20 → 2x = 12 → x = 6', 'medio', 'Matemática', 'Fundamental', '4 minutos'],
+            
+            // Português
+            [2, 'Qual alternativa apresenta concordância verbal correta?', 'Os alunos estudaram para a prova', 'Os alunos estudou para a prova', 'Os alunos estudamos para a prova', 'Os alunos estudarei para a prova', 'A', 'O verbo deve concordar com o sujeito "Os alunos" (3ª pessoa do plural)', 'medio', 'Português', 'Médio', '5 minutos'],
+            [2, 'Que figura de linguagem está presente em "O vento sussurrava segredos"?', 'Personificação', 'Metáfora', 'Hipérbole', 'Antítese', 'A', 'Personificação é atribuir características humanas a seres não-humanos', 'medio', 'Português', 'Médio', '4 minutos'],
+            
+            // Ciências
+            [3, 'Qual organela é responsável pela produção de energia?', 'Mitocôndria', 'Núcleo', 'Complexo de Golgi', 'Retículo endoplasmático', 'A', 'A mitocôndria é a usina de energia da célula', 'facil', 'Biologia', 'Médio', '3 minutos'],
+            [3, 'Qual o símbolo químico do Ouro?', 'Au', 'Ag', 'Fe', 'Cu', 'A', 'O símbolo Au vem do latim "Aurum"', 'facil', 'Química', 'Médio', '2 minutos']
+        ];
+        
+        sampleQuestions.forEach(q => {
+            db.run(`
+                INSERT INTO questions 
+                (category_id, question_text, option_a, option_b, option_c, option_d, correct_answer, explanation, difficulty, subject, grade_level, time_estimate) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            `, q);
+        });
     }
-    
-    function startQuiz(quiz) {
-        currentQuiz = quiz;
-        currentQuestionIndex = 0;
-        userAnswers = new Array(quiz.questions.length).fill(null);
-        quizTime = 0;
+
+    // Fallback para localStorage se SQLite não funcionar
+    function initLocalStorageFallback() {
+        console.log('Usando localStorage como fallback');
+        if (!localStorage.getItem('quiz_questions')) {
+            const defaultQuestions = [
+                {
+                    id: 1,
+                    category_id: 1,
+                    question_text: 'Qual o resultado de 15 + 27?',
+                    option_a: '32',
+                    option_b: '42', 
+                    option_c: '52',
+                    option_d: '62',
+                    correct_answer: 'B',
+                    explanation: '15 + 27 = 42',
+                    difficulty: 'facil',
+                    subject: 'Matemática',
+                    grade_level: 'Fundamental',
+                    time_estimate: '2 minutos'
+                }
+            ];
+            localStorage.setItem('quiz_questions', JSON.stringify(defaultQuestions));
+        }
+    }
+
+    // Buscar questões por categoria
+    function getQuestionsByCategory(categoryId) {
+        try {
+            if (!db) {
+                return getQuestionsFromLocalStorage(categoryId);
+            }
+            
+            const result = db.exec(`
+                SELECT * FROM questions 
+                WHERE category_id = ? 
+                ORDER BY RANDOM() 
+                LIMIT 10
+            `, [categoryId]);
+            
+            return formatSQLResult(result);
+        } catch (error) {
+            console.error('Erro ao buscar questões:', error);
+            return getQuestionsFromLocalStorage(categoryId);
+        }
+    }
+
+    function getQuestionsFromLocalStorage(categoryId) {
+        const questions = JSON.parse(localStorage.getItem('quiz_questions') || '[]');
+        return questions.filter(q => q.category_id == categoryId);
+    }
+
+    // Buscar todas as categorias
+    function getAllCategories() {
+        try {
+            if (!db) {
+                return [
+                    { id: 1, name: 'Matemática', description: 'Questões de matemática' },
+                    { id: 2, name: 'Português', description: 'Questões de português' },
+                    { id: 3, name: 'Ciências', description: 'Questões de ciências' }
+                ];
+            }
+            
+            const result = db.exec('SELECT * FROM categories ORDER BY name');
+            return formatSQLResult(result);
+        } catch (error) {
+            console.error('Erro ao buscar categorias:', error);
+            return [
+                { id: 1, name: 'Matemática', description: 'Questões de matemática' },
+                { id: 2, name: 'Português', description: 'Questões de português' },
+                { id: 3, name: 'Ciências', description: 'Questões de ciências' }
+            ];
+        }
+    }
+
+    // Formatar resultado do SQL
+    function formatSQLResult(result) {
+        if (!result || result.length === 0) return [];
+        
+        const columns = result[0].columns;
+        const values = result[0].values;
+        
+        return values.map(row => {
+            const obj = {};
+            columns.forEach((col, index) => {
+                obj[col] = row[index];
+            });
+            return obj;
+        });
+    }
+
+    // ========== QUIZ COM SQLITE ==========
+    function initQuiz() {
+        const categories = getAllCategories();
+        const quizCategories = document.querySelector('.quiz-categories');
+        
+        quizCategories.innerHTML = `
+            <div class="row">
+                ${categories.map(category => `
+                    <div class="col-md-4 mb-4">
+                        <div class="quiz-category" data-category="${category.id}">
+                            <div class="quiz-icon">
+                                <i class="fas fa-book fa-3x"></i>
+                            </div>
+                            <h4>${category.name}</h4>
+                            <p>${category.description}</p>
+                            <span class="badge">10 questões</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        
+        // Event listeners para as categorias
+        document.querySelectorAll('.quiz-category[data-category]').forEach(category => {
+            category.addEventListener('click', function() {
+                const categoryId = this.getAttribute('data-category');
+                startQuiz(categoryId);
+            });
+        });
+    }
+
+    function startQuiz(categoryId) {
+        const questions = getQuestionsByCategory(categoryId);
+        
+        if (questions.length === 0) {
+            alert('Nenhuma questão encontrada para esta categoria!');
+            return;
+        }
+        
+        currentQuiz = {
+            questions: questions,
+            currentQuestionIndex: 0,
+            userAnswers: new Array(questions.length).fill(null),
+            startTime: new Date()
+        };
         
         // Mostrar interface do quiz
         document.querySelector('.quiz-categories').style.display = 'none';
@@ -419,53 +662,63 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadQuestion() {
         if (!currentQuiz) return;
         
-        const question = currentQuiz.questions[currentQuestionIndex];
+        const question = currentQuiz.questions[currentQuiz.currentQuestionIndex];
         const questionText = document.getElementById('question-text');
         const quizOptions = document.getElementById('quiz-options');
         const currentQuestion = document.getElementById('current-question');
         const totalQuestions = document.getElementById('total-questions');
         
         // Atualizar texto da questão
-        questionText.textContent = question.question;
+        questionText.textContent = question.question_text;
         
         // Atualizar progresso
-        currentQuestion.textContent = currentQuestionIndex + 1;
+        currentQuestion.textContent = currentQuiz.currentQuestionIndex + 1;
         totalQuestions.textContent = currentQuiz.questions.length;
         
         // Limpar opções anteriores
         quizOptions.innerHTML = '';
         
         // Adicionar novas opções
-        question.options.forEach((option, index) => {
+        const options = [
+            { letter: 'A', text: question.option_a },
+            { letter: 'B', text: question.option_b },
+            { letter: 'C', text: question.option_c },
+            { letter: 'D', text: question.option_d }
+        ];
+        
+        options.forEach(option => {
             const optionElement = document.createElement('button');
             optionElement.className = 'quiz-option';
-            if (userAnswers[currentQuestionIndex] === index) {
+            if (currentQuiz.userAnswers[currentQuiz.currentQuestionIndex] === option.letter) {
                 optionElement.classList.add('selected');
             }
-            optionElement.textContent = option;
-            optionElement.addEventListener('click', () => selectOption(index));
+            optionElement.innerHTML = `
+                <span class="option-letter">${option.letter}</span>
+                <span class="option-text">${option.text}</span>
+            `;
+            optionElement.addEventListener('click', () => selectOption(option.letter));
             quizOptions.appendChild(optionElement);
         });
         
         // Atualizar estado dos botões de navegação
-        document.getElementById('prev-question').disabled = currentQuestionIndex === 0;
+        document.getElementById('prev-question').disabled = currentQuiz.currentQuestionIndex === 0;
     }
     
-    function selectOption(optionIndex) {
-        userAnswers[currentQuestionIndex] = optionIndex;
+    function selectOption(optionLetter) {
+        currentQuiz.userAnswers[currentQuiz.currentQuestionIndex] = optionLetter;
         loadQuestion(); // Recarregar para atualizar seleção
     }
     
     function prevQuestion() {
-        if (currentQuestionIndex > 0) {
-            currentQuestionIndex--;
+        if (currentQuiz.currentQuestionIndex > 0) {
+            currentQuiz.currentQuestionIndex--;
             loadQuestion();
         }
     }
     
     function nextQuestion() {
-        if (currentQuestionIndex < currentQuiz.questions.length - 1) {
-            currentQuestionIndex++;
+        if (currentQuiz.currentQuestionIndex < currentQuiz.questions.length - 1) {
+            currentQuiz.currentQuestionIndex++;
             loadQuestion();
         }
     }
@@ -478,8 +731,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Calcular pontuação
         let correctAnswers = 0;
-        userAnswers.forEach((answer, index) => {
-            if (answer === currentQuiz.questions[index].correct) {
+        currentQuiz.userAnswers.forEach((answer, index) => {
+            if (answer === currentQuiz.questions[index].correct_answer) {
                 correctAnswers++;
             }
         });
@@ -505,85 +758,67 @@ document.addEventListener('DOMContentLoaded', function() {
     function restartQuiz() {
         document.getElementById('quiz-results').style.display = 'none';
         document.querySelector('.quiz-categories').style.display = 'block';
+        currentQuiz = null;
+        userAnswers = [];
+        quizTime = 0;
     }
     
     // ========== EXERCÍCIOS ==========
-    // Dados simulados para os exercícios
-    const exerciciosData = {
-        'natureza': {
-            titulo: 'Exercícios de Ciências da Natureza',
-            descricao: 'Biologia, Química e Física',
-            exercicios: [
-                { titulo: 'Química Orgânica - Funções Nitrogenadas', dificuldade: 'Médio' },
-                { titulo: 'Biologia Celular - Mitose e Meiose', dificuldade: 'Fácil' },
-                { titulo: 'Física - Leis de Newton', dificuldade: 'Difícil' },
-                { titulo: 'Química - Estequiometria', dificuldade: 'Médio' },
-                { titulo: 'Biologia - Genética Mendeliana', dificuldade: 'Médio' },
-                { titulo: 'Física - Termodinâmica', dificuldade: 'Difícil' }
-            ]
-        },
-        'humanas': {
-            titulo: 'Exercícios de Ciências Humanas',
-            descricao: 'História, Geografia, Filosofia e Sociologia',
-            exercicios: [
-                { titulo: 'História do Brasil - Período Colonial', dificuldade: 'Fácil' },
-                { titulo: 'Geografia - Globalização', dificuldade: 'Médio' },
-                { titulo: 'Filosofia - Pensamento Grego', dificuldade: 'Difícil' },
-                { titulo: 'Sociologia - Movimentos Sociais', dificuldade: 'Médio' }
-            ]
-        },
-        'exatas': {
-            titulo: 'Exercícios de Ciências Exatas',
-            descricao: 'Matemática, Física e Química',
-            exercicios: [
-                { titulo: 'Matemática - Funções de 2º Grau', dificuldade: 'Fácil' },
-                { titulo: 'Física - Cinemática', dificuldade: 'Médio' },
-                { titulo: 'Química - Tabela Periódica', dificuldade: 'Fácil' },
-                { titulo: 'Matemática - Geometria Espacial', dificuldade: 'Difícil' },
-                { titulo: 'Física - Eletricidade', dificuldade: 'Difícil' }
-            ]
-        }
-    };
-    
+    // Função para carregar exercícios
     function showExercisesList(category) {
-        const categoryData = exerciciosData[category];
+        // Atualizar título e descrição
+        document.getElementById('categoria-titulo').textContent = getCategoryTitle(category);
+        document.getElementById('categoria-descricao').textContent = getCategoryDescription(category);
         
-        if (categoryData) {
-            // Atualizar título e descrição
-            document.getElementById('categoria-titulo').textContent = categoryData.titulo;
-            document.getElementById('categoria-descricao').textContent = categoryData.descricao;
-            
-            // Limpar container de exercícios
-            const container = document.getElementById('exercicios-container');
-            container.innerHTML = '';
-            
-            // Adicionar exercícios
-            categoryData.exercicios.forEach(exercicio => {
-                const exerciseItem = document.createElement('div');
-                exerciseItem.className = 'col-md-6';
-                exerciseItem.innerHTML = `
-                    <div class="exercise-item">
-                        <div class="exercise-header">
-                            <span class="exercise-title">${exercicio.titulo}</span>
-                            <span class="exercise-difficulty difficulty-${exercicio.dificuldade.toLowerCase()}">${exercicio.dificuldade}</span>
-                        </div>
-                        <p>Clique para iniciar este exercício</p>
-                        <button class="btn btn-sm btn-primary iniciar-exercicio">Iniciar</button>
+        // Limpar container de exercícios
+        const container = document.getElementById('exercicios-container');
+        container.innerHTML = '<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Carregando...</span></div><p class="mt-2">Carregando exercícios...</p></div>';
+        
+        // Por enquanto, vamos mostrar uma mensagem
+        setTimeout(() => {
+            container.innerHTML = `
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h5>Exercícios da Categoria ${getCategoryTitle(category)}</h5>
+                        <p>Esta funcionalidade carregará exercícios da categoria <strong>${category}</strong>.</p>
                     </div>
-                `;
-                container.appendChild(exerciseItem);
-            });
-            
-            // Mostrar página de lista de exercícios
-            showPage('lista-exercicios');
-        }
+                </div>
+            `;
+        }, 1000);
+        
+        // Mostrar página de lista de exercícios
+        showPage('lista-exercicios');
+    }
+    
+    function getCategoryTitle(category) {
+        const titles = {
+            'natureza': 'Exercícios de Ciências da Natureza',
+            'humanas': 'Exercícios de Ciências Humanas',
+            'exatas': 'Exercícios de Ciências Exatas',
+            'linguagem': 'Exercícios de Linguagens',
+            'vestibular': 'Exercícios para Vestibular',
+            'enem': 'Exercícios do ENEM'
+        };
+        return titles[category] || 'Exercícios';
+    }
+    
+    function getCategoryDescription(category) {
+        const descriptions = {
+            'natureza': 'Biologia, Química e Física',
+            'humanas': 'História, Geografia, Filosofia e Sociologia',
+            'exatas': 'Matemática, Física e Química',
+            'linguagem': 'Português, Literatura e Línguas',
+            'vestibular': 'Exercícios específicos para vestibulares',
+            'enem': 'Questões do ENEM e simulados'
+        };
+        return descriptions[category] || 'Lista de exercícios disponíveis';
     }
     
     // Botões de iniciar exercício
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('iniciar-exercicio')) {
             const exerciseTitle = e.target.closest('.exercise-item').querySelector('.exercise-title').textContent;
-            alert(`Iniciando exercício: ${exerciseTitle}\n\nEsta funcionalidade se conectaria com sua API para carregar o exercício específico.`);
+            alert(`Iniciando exercício: ${exerciseTitle}\n\nEsta funcionalidade carregará o exercício específico.`);
             
             // Simular conclusão de exercício para atualizar estatísticas
             simulateExerciseCompletion();
@@ -595,7 +830,7 @@ document.addEventListener('DOMContentLoaded', function() {
     simuladoButtons.forEach(button => {
         button.addEventListener('click', function() {
             const simuladoTitle = this.closest('.card-simulado').querySelector('h4').textContent;
-            alert(`Iniciando: ${simuladoTitle}\n\nEsta funcionalidade se conectaria com sua API para carregar o simulado.`);
+            alert(`Iniciando: ${simuladoTitle}\n\nEsta funcionalidade carregará o simulado.`);
         });
     });
     
@@ -750,10 +985,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ========== INICIALIZAÇÃO ==========
-    function initializeApp() {
+    async function initializeApp() {
         loadStudyTime();
         loadProgressStats();
         carregarConfiguracoes();
+        
+        // Inicializar banco de dados
+        await initDatabase();
         
         // Inicializar funcionalidades específicas se estiverem na página ativa
         if (document.getElementById('flashcards').classList.contains('active')) {

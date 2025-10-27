@@ -1154,3 +1154,75 @@ body.modo-escuro .score-circle:before {
         margin-left: 0;
     }
 }
+
+.question-form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.quiz-category.add-question-btn {
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 2px dashed #ccc;
+}
+
+.quiz-category.add-question-btn:hover {
+    transform: translateY(-2px);
+    border-color: #28a745;
+}
+
+.option-letter {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.quiz-option {
+    display: flex;
+    align-items: flex-start;
+    text-align: left;
+}
+
+.quiz-option {
+    display: flex;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 10px;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.quiz-option:hover {
+    border-color: #007bff;
+    background: #f8f9fa;
+}
+
+.quiz-option.selected {
+    border-color: #007bff;
+    background: #e7f3ff;
+}
+
+.option-letter {
+    font-weight: bold;
+    margin-right: 15px;
+    color: #007bff;
+    min-width: 20px;
+}
+
+.option-text {
+    flex: 1;
+    text-align: left;
+}
+
+.quiz-category {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.quiz-category:hover {
+    transform: translateY(-2px);
+}
